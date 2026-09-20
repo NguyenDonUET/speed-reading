@@ -22,7 +22,6 @@ export interface Passage {
   text: string
   vocab: VocabWord[]
   quiz: QuizQuestion[]
-  isBaseline?: boolean
 }
 
 export interface SessionSettings {
@@ -32,12 +31,6 @@ export interface SessionSettings {
   topic: PassageTopic | 'any'
   vocabFlash: boolean
   wpm: number
-}
-
-export interface BaselineRecord {
-  wpm: number
-  comprehension: number
-  at: string
 }
 
 export interface SessionRecord {
@@ -55,7 +48,6 @@ export interface StreakRecord {
 }
 
 export interface PaceStore {
-  baseline: BaselineRecord | null
   currentWpm: number
   settings: SessionSettings
   streak: StreakRecord

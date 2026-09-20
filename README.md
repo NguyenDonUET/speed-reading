@@ -27,9 +27,8 @@ pnpm preview
 
 ## Flow
 
-1. **Dashboard** — start practice anytime; optional baseline test
+1. **Dashboard** — streak, charts, start practice
 2. **Setup** — WPM, mode, topic/length, vocab flash
 3. **Optional vocab flash** — rapid definitions
 4. **Reading session** — word / phrase / RSVP with pause and ±WPM
 5. **Quiz** — score vs 75% threshold; next WPM +25 / hold / −25
-6. **Baseline (optional)** — unassisted read + quiz to compare natural pace

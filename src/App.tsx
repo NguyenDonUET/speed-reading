@@ -1,6 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { SessionProvider } from './context/session-context'
-import { BaselinePage } from './pages/BaselinePage'
 import { DashboardPage } from './pages/DashboardPage'
 import { QuizPage } from './pages/QuizPage'
 import { ReadPage } from './pages/ReadPage'
@@ -12,7 +11,6 @@ export default function App() {
     <SessionProvider>
       <Routes>
         <Route path="/" element={<DashboardPage />} />
-        <Route path="/baseline" element={<BaselinePage />} />
         <Route path="/session/setup" element={<SetupPage />} />
         <Route path="/session/vocab" element={<VocabPage />} />
         <Route path="/session/read" element={<ReadPage />} />

@@ -1,5 +1,4 @@
 import type {
-  BaselineRecord,
   PaceStore,
   SessionRecord,
   SessionSettings,
@@ -26,7 +25,6 @@ function todayKey(date = new Date()): string {
 
 function defaultStore(): PaceStore {
   return {
-    baseline: null,
     currentWpm: 150,
     settings: { ...DEFAULT_SETTINGS },
     streak: { lastDate: '', count: 0 },
@@ -113,28 +111,6 @@ export function setCurrentWpm(wpm: number): number {
   }
   saveStore(store)
   return store.currentWpm
-}
-
-export function recordBaseline(
-  wpm: number,
-  comprehension: number,
-): BaselineRecord {
-  const prev = loadStore()
-  const record: BaselineRecord = {
-    wpm: Math.round(wpm),
-    comprehension: Math.round(comprehension),
-    at: new Date().toISOString(),
-  }
-  const nextWpm = clampWpm(record.wpm)
-  const store: PaceStore = {
-    ...prev,
-    baseline: record,
-    currentWpm: nextWpm,
-    settings: { ...prev.settings, wpm: nextWpm },
-    streak: updateStreak(prev.streak),
-  }
-  saveStore(store)
-  return record
 }
 
 export function recordSession(

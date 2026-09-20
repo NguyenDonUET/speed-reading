@@ -2,11 +2,10 @@ import type { Passage, PassageLength, PassageTopic } from '../types'
 
 export const passages: Passage[] = [
   {
-    id: 'baseline-morning',
+    id: 'quiet-morning',
     title: 'A Quiet Morning',
     topic: 'nonfiction',
     length: 'short',
-    isBaseline: true,
     text: `The street was still damp from overnight rain when Mara left her apartment. She walked without headphones, listening to the soft slap of her shoes on the pavement and the distant hum of a bus turning the corner. At the bakery, the windows fogged from the warmth inside. She bought a plain roll and stood under the awning for a minute, watching a courier lock a bicycle to a signpost. Nothing urgent waited for her. That was the point of the morning: to notice how ordinary minutes feel when no one is measuring them. She finished the roll, brushed crumbs from her coat, and continued toward the river, where the water moved the same steady gray it always did.`,
     vocab: [
       { word: 'awning', definition: 'A sheet of canvas or metal that shades a doorway or window.' },
@@ -308,16 +307,11 @@ export function getPassage(id: string): Passage | undefined {
   return passages.find((p) => p.id === id)
 }
 
-export function getBaselinePassage(): Passage {
-  return passages.find((p) => p.isBaseline) ?? passages[0]
-}
-
 export function filterPassages(
   topic: PassageTopic | 'any',
   length: PassageLength,
 ): Passage[] {
   return passages.filter((p) => {
-    if (p.isBaseline) return false
     if (topic !== 'any' && p.topic !== topic) return false
     return p.length === length
   })
@@ -334,6 +328,5 @@ export function pickPassage(
     if (preferred) return preferred
   }
   if (filtered.length > 0) return filtered[0]
-  const nonBaseline = passages.filter((p) => !p.isBaseline)
-  return nonBaseline[0] ?? passages[0]
+  return passages[0]
 }

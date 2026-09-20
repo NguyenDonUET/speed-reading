@@ -38,22 +38,14 @@ export function DashboardPage() {
         streakCount={store.streak.count}
         totalSessions={store.sessions.length}
         currentWpm={store.currentWpm}
-        baselineWpm={store.baseline?.wpm ?? null}
-        baselineComprehension={store.baseline?.comprehension ?? null}
       />
 
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-6">
         <Link
           to="/session/setup"
           className="inline-flex items-center justify-center rounded-xl bg-accent px-5 py-3 text-center text-base font-semibold text-paper no-underline transition hover:bg-accent-hover"
         >
           Start practice
-        </Link>
-        <Link
-          to="/baseline"
-          className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-5 py-3 text-center text-base font-semibold text-ink no-underline transition hover:border-accent"
-        >
-          Baseline test
         </Link>
       </div>
 

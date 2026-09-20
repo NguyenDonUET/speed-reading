@@ -22,12 +22,6 @@ export function formatDuration(totalSeconds: number): string {
   return `${m}:${rem.toString().padStart(2, '0')}`
 }
 
-export function calculateNaturalWpm(wordCount: number, elapsedMs: number): number {
-  const minutes = elapsedMs / 60_000
-  if (minutes <= 0) return 0
-  return Math.round(wordCount / minutes)
-}
-
 export function clampWpm(wpm: number, min = 100, max = 600): number {
   return Math.min(max, Math.max(min, Math.round(wpm)))
 }
