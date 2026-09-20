@@ -31,27 +31,32 @@ export function ReadingSessionView({
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const [wpm, setWpm] = useState(initialWpm)
+  const [reachedEnd, setReachedEnd] = useState(false)
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const completedRef = useRef(false)
+  const finishedRef = useRef(false)
 
   const wordsRead = useMemo(() => {
+    if (reachedEnd || index >= chunks.length) {
+      return totalWords
+    }
     return chunks.slice(0, index).reduce((sum, c) => sum + c.wordCount, 0)
-  }, [chunks, index])
+  }, [chunks, index, reachedEnd, totalWords])
 
   const percent = totalWords === 0 ? 0 : (wordsRead / totalWords) * 100
   const remainingWords = Math.max(0, totalWords - wordsRead)
   const secondsRemaining = estimateSecondsRemaining(remainingWords, wpm)
 
   const finish = useCallback(() => {
-    if (completedRef.current) return
-    completedRef.current = true
+    if (finishedRef.current) return
+    finishedRef.current = true
     onComplete(wpm)
   }, [onComplete, wpm])
 
   useEffect(() => {
-    if (paused || completedRef.current) return
+    if (paused || finishedRef.current || reachedEnd) return
     if (index >= chunks.length) {
-      finish()
+      setReachedEnd(true)
+      setPaused(true)
       return
     }
 
@@ -59,7 +64,7 @@ export function ReadingSessionView({
     const delay = msPerChunk(wpm, chunk.wordCount)
     let cancelled = false
     const timer = window.setTimeout(() => {
-      if (cancelled || completedRef.current) return
+      if (cancelled || finishedRef.current) return
       setIndex((i) => i + 1)
     }, delay)
 
@@ -67,7 +72,7 @@ export function ReadingSessionView({
       cancelled = true
       window.clearTimeout(timer)
     }
-  }, [index, paused, wpm, chunks, finish])
+  }, [index, paused, wpm, chunks, reachedEnd])
 
   const adjustWpm = (delta: number) => {
     setWpm((prev) => {
@@ -77,20 +82,33 @@ export function ReadingSessionView({
     })
   }
 
+  const replay = useCallback(() => {
+    finishedRef.current = false
+    setIndex(0)
+    setReachedEnd(false)
+    setPaused(false)
+  }, [])
+
   const isRsvp = mode === 'rsvp'
-  const activeChunk = chunks[Math.min(index, chunks.length - 1)]
+  const activeChunk = chunks[Math.min(index, Math.max(0, chunks.length - 1))]
+  const displayPercent = reachedEnd ? 100 : Math.min(100, percent)
 
   return (
     <div className="relative flex h-dvh max-h-dvh flex-col overflow-hidden bg-paper">
       <ProgressStrip
-        percent={Math.min(100, percent)}
-        secondsRemaining={secondsRemaining}
+        percent={displayPercent}
+        secondsRemaining={reachedEnd ? 0 : secondsRemaining}
         wpm={wpm}
       />
 
       {isRsvp ? (
-        <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-14">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-14">
           <RsvpDisplay text={activeChunk?.text ?? ''} paused={paused} />
+          {reachedEnd ? (
+            <p className="mt-6 text-sm text-ink-muted">
+              End of passage — tap Finish for the quiz, or Replay to practice again
+            </p>
+          ) : null}
         </div>
       ) : (
         <div
@@ -102,12 +120,17 @@ export function ReadingSessionView({
             paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))',
           }}
         >
-          <div className="mx-auto w-full max-w-3xl pb-[40vh] pt-[18vh] sm:pb-[35vh] sm:pt-[28vh]">
+          <div className="mx-auto w-full max-w-3xl pb-[22vh] pt-[8vh] sm:pb-[20vh] sm:pt-[14vh]">
             <ChunkHighlighter
               chunks={chunks}
-              activeIndex={Math.min(index, chunks.length - 1)}
+              activeIndex={Math.min(index, Math.max(0, chunks.length - 1))}
               containerRef={containerRef}
             />
+            {reachedEnd ? (
+              <p className="mt-8 text-center text-sm text-ink-muted">
+                End of passage — tap Finish for the quiz
+              </p>
+            ) : null}
           </div>
         </div>
       )}
@@ -115,10 +138,16 @@ export function ReadingSessionView({
       <SessionChrome
         paused={paused}
         wpm={wpm}
-        onTogglePause={() => setPaused((p) => !p)}
+        onTogglePause={() => {
+          if (reachedEnd) return
+          setPaused((p) => !p)
+        }}
         onWpmDelta={adjustWpm}
         showFinish
         onFinish={finish}
+        endReached={reachedEnd}
+        showReplay={isRsvp}
+        onReplay={replay}
       />
     </div>
   )

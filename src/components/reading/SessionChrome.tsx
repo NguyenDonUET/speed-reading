@@ -5,6 +5,9 @@ interface SessionChromeProps {
   onWpmDelta: (delta: number) => void
   onFinish?: () => void
   showFinish?: boolean
+  endReached?: boolean
+  showReplay?: boolean
+  onReplay?: () => void
 }
 
 export function SessionChrome({
@@ -14,6 +17,9 @@ export function SessionChrome({
   onWpmDelta,
   onFinish,
   showFinish = false,
+  endReached = false,
+  showReplay = false,
+  onReplay,
 }: SessionChromeProps) {
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-paper from-40% via-paper/95 to-transparent pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-12">
@@ -21,7 +27,8 @@ export function SessionChrome({
         <button
           type="button"
           onClick={() => onWpmDelta(-25)}
-          className="min-h-11 min-w-11 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm font-medium text-ink shadow-sm transition active:scale-[0.98] hover:border-accent hover:text-accent"
+          disabled={endReached}
+          className="min-h-11 min-w-11 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm font-medium text-ink shadow-sm transition active:scale-[0.98] hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="Decrease speed by 25 WPM"
         >
           −25
@@ -29,18 +36,30 @@ export function SessionChrome({
         <button
           type="button"
           onClick={onTogglePause}
-          className="min-h-11 min-w-28 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-paper shadow-sm transition active:scale-[0.98] hover:bg-accent-hover"
+          disabled={endReached}
+          className="min-h-11 min-w-28 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-paper shadow-sm transition active:scale-[0.98] hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
         >
           {paused ? 'Resume' : 'Pause'}
         </button>
         <button
           type="button"
           onClick={() => onWpmDelta(25)}
-          className="min-h-11 min-w-11 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm font-medium text-ink shadow-sm transition active:scale-[0.98] hover:border-accent hover:text-accent"
+          disabled={endReached}
+          className="min-h-11 min-w-11 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm font-medium text-ink shadow-sm transition active:scale-[0.98] hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
           aria-label="Increase speed by 25 WPM"
         >
           +25
         </button>
+        {showReplay && onReplay ? (
+          <button
+            type="button"
+            onClick={onReplay}
+            className="min-h-11 rounded-lg border border-border bg-surface px-3 py-2.5 text-sm font-medium text-ink shadow-sm transition active:scale-[0.98] hover:border-accent hover:text-accent"
+            aria-label="Replay from the beginning"
+          >
+            Replay
+          </button>
+        ) : null}
         <span className="w-full text-center text-sm text-ink-muted tabular-nums sm:ml-1 sm:w-auto sm:text-left">
           {wpm} WPM
         </span>
@@ -48,7 +67,12 @@ export function SessionChrome({
           <button
             type="button"
             onClick={onFinish}
-            className="min-h-11 rounded-lg border border-accent/40 bg-accent-soft px-3 py-2.5 text-sm font-medium text-accent transition active:scale-[0.98] hover:bg-accent hover:text-paper sm:ml-2"
+            className={[
+              'min-h-11 rounded-lg px-3 py-2.5 text-sm font-medium transition active:scale-[0.98] sm:ml-2',
+              endReached
+                ? 'border border-accent bg-accent text-paper hover:bg-accent-hover'
+                : 'border border-accent/40 bg-accent-soft text-accent hover:bg-accent hover:text-paper',
+            ].join(' ')}
           >
             Finish
           </button>
