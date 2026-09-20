@@ -68,18 +68,30 @@ export function DifficultyPanel({
         </div>
       </section>
 
-      <section>
+      <section className="select-text">
         <p className="text-sm font-semibold text-ink">Highlight mode</p>
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        <div
+          className="mt-3 grid gap-2 sm:grid-cols-3"
+          role="radiogroup"
+          aria-label="Highlight mode"
+        >
           {MODES.map((mode) => {
             const active = settings.mode === mode.id
             return (
-              <button
+              <div
                 key={mode.id}
-                type="button"
+                role="radio"
+                aria-checked={active}
+                tabIndex={0}
                 onClick={() => onChange({ mode: mode.id })}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onChange({ mode: mode.id })
+                  }
+                }}
                 className={[
-                  'rounded-xl border px-3 py-3 text-left transition',
+                  'cursor-pointer rounded-xl border px-3 py-3 text-left transition select-text',
                   active
                     ? 'border-accent bg-accent-soft'
                     : 'border-border bg-surface hover:border-accent/40',
@@ -89,7 +101,7 @@ export function DifficultyPanel({
                   {mode.label}
                 </span>
                 <span className="mt-1 block text-xs text-ink-muted">{mode.hint}</span>
-              </button>
+              </div>
             )
           })}
         </div>
